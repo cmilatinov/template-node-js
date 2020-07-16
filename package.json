@@ -1,5 +1,5 @@
 {
-    "name": "template-node-js",
+    "name": "{{ APP_NAME }}",
     "version": "1.0.0",
     "scripts": {
         "start": "nodemon"
