@@ -3,13 +3,13 @@ const knex = require('knex');
 const env = require('../../config/environment');
 
 const database = knex({
-    client: env.database.type,
+    client: env.config.database.type,
     connection: {
-        host: env.database.host,
-        user: env.database.user,
-        password: env.database.pass,
-        port: parseInt(env.database.port),
-        database: env.database.name,
+        host: env.config.database.host,
+        user: env.config.database.user,
+        password: env.config.database.pass,
+        port: parseInt(env.config.database.port),
+        database: env.config.database.name,
         connectionTimeout: 15000,
         requestTimeout: 60000,
         options: {

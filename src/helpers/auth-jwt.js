@@ -5,7 +5,7 @@ const env = require('../../config/environment');
 
 module.exports = {
     issueJWT(user) {
-        return jwt.sign({ sub: user.id }, env.auth.secret, { expiresIn: '10h' });
+        return jwt.sign({ sub: user.id }, env.config.auth.secret, { expiresIn: '10h' });
     },
     authenticate(req, res, next) {
         passport.authenticate('jwt', { session: false }, (err, user) => {

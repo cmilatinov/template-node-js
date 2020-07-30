@@ -10,7 +10,7 @@ const ExtractJwt = passportJWT.ExtractJwt;
 passport.use(new JwtStrategy(
     {
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-        secretOrKey: env.auth.secret
+        secretOrKey: env.config.auth.secret
     },
     (payload, done) => {
         db('users')

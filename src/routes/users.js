@@ -79,6 +79,27 @@ router.post('/login', checkRequiredPOST('email', 'password'), async (req, res) =
 
 });
 
+router.post('/send-reset-password', checkRequiredPOST('email'), async (req, res) => {
+
+    // Required fields
+    const { email } = req.body;
+
+    // Find user
+    const user = await db('users')
+		.where('deleted', false)
+		.where('email', email)
+		.first();
+    if (!user)
+        return res.status(HTTP_BAD_REQUEST).send('user_not_found');
+
+    // Send email from template
+    await sendMail(user.email, 'Reset your password', 'forgot-password', { ACTION: `http://localhost:8080/reset-password/${user.resetGUID}` })
+
+    // Return OK
+    res.sendStatus(HTTP_OK);
+
+});
+
 router.post('/reset-password', checkRequiredPOST('guid', 'password'), async (req, res) => {
 
     // Required fields
