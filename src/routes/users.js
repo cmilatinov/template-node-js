@@ -6,6 +6,7 @@ const { isValidEmail, isValidName, isValidPassword } = require('../helpers/valid
 const { checkRequiredPOST } = require('../helpers/middleware');
 const { authenticate, issueJWT } = require('../helpers/auth-jwt');
 const { formatUser, generateUUID } = require('../helpers/utils');
+const { sendMail }  = require('../helpers/email');
 
 const router = express();
 
@@ -42,8 +43,8 @@ router.post('/register', checkRequiredPOST('firstName', 'lastName', 'email', 'pa
     // Create and return user
     const [user] = await db('users')
         .insert({
-            firstName,
-            lastName,
+            first_name: firstName,
+            last_name: lastName,
             email,
             password: bcrypt.hashSync(password, 10)
         })
@@ -93,7 +94,7 @@ router.post('/send-reset-password', checkRequiredPOST('email'), async (req, res)
         return res.status(HTTP_BAD_REQUEST).send('user_not_found');
 
     // Send email from template
-    await sendMail(user.email, 'Reset your password', 'forgot-password', { ACTION: `http://localhost:8080/reset-password/${user.resetGUID}` })
+    await sendMail(user.email, 'Reset your password', 'forgot-password', { ACTION: `http://localhost:8080/reset-password/${user.reset_guid}` })
 
     // Return OK
     res.sendStatus(HTTP_OK);
@@ -118,9 +119,12 @@ router.post('/reset-password', checkRequiredPOST('guid', 'password'), async (req
         return res.status(HTTP_BAD_REQUEST).send('invalid_password');
 
     // Save new password and generate new GUID
-    user.password = bcrypt.hashSync(password, 10);
-    user.resetGUID = generateUUID();
-    await user.save();
+    await db('users')
+        .where('id', user.id)
+        .update({
+            password: bcrypt.hashSync(password, 10),
+            reset_guid: generateUUID()
+        });
 
     // Return OK
     res.sendStatus(HTTP_OK);
